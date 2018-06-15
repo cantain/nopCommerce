@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -48,6 +49,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             services.ConfigureStartupConfig<NopConfig>(configuration.GetSection("Nop"));
             //add hosting configuration parameters
             services.ConfigureStartupConfig<HostingConfig>(configuration.GetSection("Hosting"));
+            services.ConfigureStartupConfig<JwtConfig>(configuration.GetSection("Jwt"));
             //add accessor to HttpContext
             services.AddHttpContextAccessor();
 
@@ -221,7 +223,18 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 options.Cookie.SecurePolicy = DataSettingsManager.DatabaseIsInstalled && EngineContext.Current.Resolve<SecuritySettings>().ForceSslForAllPages
                     ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.None;
             });
-            
+
+            authenticationBuilder.AddJwtBearer(jwt =>
+            {
+                var jwtConfig = EngineContext.Current.Resolve<JwtConfig>();
+                jwt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = jwtConfig.Issuer,
+                    ValidAudience = jwtConfig.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(jwtConfig.JwtSecret))
+                };
+            });
+
             //register and configure external authentication plugins now
             var typeFinder = new WebAppTypeFinder();
             var externalAuthConfigurations = typeFinder.FindClassesOfType<IExternalAuthenticationRegistrar>();
@@ -310,11 +323,11 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 (miniProfilerOptions.Storage as MemoryCacheStorage).CacheDuration = TimeSpan.FromMinutes(60);
 
                 //whether MiniProfiler should be displayed
-                miniProfilerOptions.ShouldProfile = request => 
+                miniProfilerOptions.ShouldProfile = request =>
                     EngineContext.Current.Resolve<StoreInformationSettings>().DisplayMiniProfilerInPublicStore;
-                
+
                 //determine who can access the MiniProfiler results
-                miniProfilerOptions.ResultsAuthorize = request => 
+                miniProfilerOptions.ResultsAuthorize = request =>
                     !EngineContext.Current.Resolve<StoreInformationSettings>().DisplayMiniProfilerForAdminOnly ||
                     EngineContext.Current.Resolve<IPermissionService>().Authorize(StandardPermissionProvider.AccessAdminPanel);
             }).AddEntityFramework();

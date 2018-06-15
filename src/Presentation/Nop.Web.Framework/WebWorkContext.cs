@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
@@ -551,6 +552,7 @@ namespace Nop.Web.Framework
         /// Gets or sets value indicating whether we're in admin area
         /// </summary>
         public virtual bool IsAdmin { get; set; }
+        public IList<int> TenantIds { get; set; }
 
         #endregion
     }

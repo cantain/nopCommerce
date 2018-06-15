@@ -3,7 +3,8 @@
 @using Nop.Core
 @inject IWebHelper webHelper
 @{
-    Layout = "_ColumnsOne";
+    //Layout = "_ColumnsOne";
+    Layout = "_Root.Head";
 
     //title
     Html.AddTitleParts(T("PageTitle.Login").Text);
@@ -11,15 +12,17 @@
     Html.AppendPageCssClassParts("html-login-page");
 
     //register URL with return URL (if specified)
-    var registerUrl = Url.RouteUrl("Register", null, webHelper.CurrentRequestProtocol);
+    var registerUrl = Url.RouteUrl("Register");
     if (!string.IsNullOrEmpty(this.Context.Request.Query["returnUrl"]))
     {
-        registerUrl = webHelper.ModifyQueryString(registerUrl, "returnurl", this.Context.Request.Query["returnUrl"]);
+        registerUrl = webHelper.ModifyQueryString(registerUrl, "returnurl=" + WebUtility.UrlEncode(this.Context.Request.Query["returnUrl"]), null);
     }
 }
 <div class="page login-page">
     <div class="page-title">
-        <h1>@T("Account.Login.Welcome")</h1>
+
+        <img src=~/images/logo_small.png alt="云立方" >
+       <h1>智能云生活管理后台</h1>
     </div>
     @await Html.PartialAsync("_ExternalAuthentication.Errors")
     <div class="page-body">
@@ -41,25 +44,25 @@
             }
             else
             {
-                <div class="new-wrapper register-block">
-                    <div class="title">
-                        <strong>@T("Account.Login.NewCustomer")</strong>
+                <div class="new-wrapper register-block" style="text-align:center">
+                    <div class="title" >
+                        <strong>新用户</strong>
                     </div>
                     <div class="text">
-                        @T("Account.Login.NewCustomerText")
+                       如果你还没有管理账号，请选择注册
                     </div>
                     <div class="buttons">
                         <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />
                     </div>
                 </div>
             }
-            <div class="returning-wrapper fieldset">
+            <div class="returning-wrapper fieldset" >
                 <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post">
                     <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
                     <div class="title">
-                        <strong>@T("Account.Login.ReturningCustomer")</strong>
+                        <strong>老用户</strong>
                     </div>
-                    <div class="form-fields">
+                    <div class="form-fields" >
                         @if (Model.UsernamesEnabled)
                         {
                             <div class="inputs">
@@ -95,15 +98,15 @@
                             </div>
                         }
                     </div>
-                    <div class="buttons">
+                    <div class="buttons" >
                         <input class="button-1 login-button" type="submit" value="@T("Account.Login.LoginButton")" />
                     </div>
                 </form>
             </div>
         </div>
-        <div class="external-authentication">
+        @*<div class="external-authentication">
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
         </div>
-        @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })*@
     </div>
 </div>
