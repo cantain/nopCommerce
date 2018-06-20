@@ -119,7 +119,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (store != null || storeid == 0)
             {
                 _genericAttributeService
-                    .SaveAttribute(_workContext.CurrentCustomer, SystemCustomerAttributeNames.AdminAreaStoreScopeConfiguration, storeid);
+                    .SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.AdminAreaStoreScopeConfigurationAttribute, storeid);
             }
 
             //home page
@@ -1156,7 +1156,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             commonSettings.SubjectFieldOnContactUsForm = model.StoreInformationSettings.SubjectFieldOnContactUsForm;
             commonSettings.UseSystemEmailForContactUsForm = model.StoreInformationSettings.UseSystemEmailForContactUsForm;
             //terms of service
-            commonSettings.PopupForTermsOfServiceLinks = model.StoreInformationSettings.PopupForTermsOfServiceLinks;
+            commonSettings.PopupForTermsOfServiceLinks = model.StoreInformationSettings.PopupForTermsOfServiceLinks;            
             //sitemap
             commonSettings.SitemapEnabled = model.StoreInformationSettings.SitemapEnabled;
             commonSettings.SitemapPageSize = model.StoreInformationSettings.SitemapPageSize;
