@@ -63,12 +63,12 @@
                     <div class="title">
                         <strong>老用户</strong>
                     </div>
-                    <div class="form-fields" >
+                    <div class="form-fields">
                         @if (Model.UsernamesEnabled)
-    {
+                        {
                             <div class="inputs">
                                 <label asp-for="Username" asp-postfix=":"></label>
-                                <input asp-for="Username" class="username" autofocus="autofocus"  />
+                                <input asp-for="Username" class="username" autofocus="autofocus" />
                                 <span asp-validation-for="Username"></span>
                             </div>
                         }
@@ -93,13 +93,17 @@
                             </span>
                         </div>
                         @if (Model.DisplayCaptcha)
-    {
+                        {
                             <div class="captcha-box">
                                 <nop-captcha />
                             </div>
                         }
 
-                        <nop-qq-captcha asp-qq-captcha-callback="callback" />
+                        <div class="inputs">
+                            <label>验证码:</label>
+                            <nop-qq-captcha asp-qq-captcha-callback="callback" />
+                        </div>
+                        
                     </div>
                     <div class="buttons">
                         <input class="button-1 login-button" onclick="" type="submit" value="@T("Account.Login.LoginButton")" />
