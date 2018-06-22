@@ -46,5 +46,21 @@ namespace Nop.Web.Framework.Security.Captcha
 
             return new HtmlString(captchaControl.RenderControl());
         }
+
+        public static IHtmlContent GenerateQQCaptcha(this IHtmlHelper helper, string callback)
+        {
+            var captchaSettings = EngineContext.Current.Resolve<QQCaptchaSettings>();
+            var workContext = EngineContext.Current.Resolve<IWorkContext>();
+
+                      //generate captcha control
+            var captchaControl = new QQcaptchaControl
+            {
+                Id = "TencentCaptcha",
+                Aid = captchaSettings.Aid,
+                Callback = callback
+            };
+
+            return new HtmlString(captchaControl.RenderControl());
+        }
     }
 }

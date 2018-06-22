@@ -1040,6 +1040,21 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(settings => settings.AutomaticallyChooseLanguage, options => options.Ignore())
                 .ForMember(settings => settings.ReCaptchaDefaultLanguage, options => options.Ignore())
                 .ForMember(settings => settings.ReCaptchaTheme, options => options.Ignore());
+
+            CreateMap<QQCaptchaSettings, QQCaptchaSettingsModel>()
+                .ForMember(model => model.Enabled_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.AppId_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.AppSecretKey_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnApplyVendorPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnBlogCommentPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnContactUsPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnEmailProductToFriendPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnEmailWishlistToFriendPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnLoginPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnNewsCommentPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnProductReviewPage_OverrideForStore, options => options.Ignore())
+                .ForMember(model => model.ShowOnRegistrationPage_OverrideForStore, options => options.Ignore());
+            CreateMap<QQCaptchaSettingsModel, QQCaptchaSettings>();
         }
 
         /// <summary>

@@ -217,9 +217,9 @@
                                 <nop-override-store-checkbox asp-for="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem_OverrideForStore" asp-input="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
                                 <nop-label asp-for="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem" />
                             </div>
-                            <div class="col-md-9">  
+                            <div class="col-md-9">
                                 <nop-editor asp-for="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem" />
-                                <span asp-validation-for="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem"></span> 
+                                <span asp-validation-for="DisplayDefaultMenuItemSettings.DisplayForumsMenuItem"></span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -234,7 +234,7 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <div class="panel panel-default advanced-setting">
                     <div class="panel-heading">
                         @T("Admin.Configuration.Settings.GeneralCommon.BlockTitle.FooterItems")
@@ -260,7 +260,7 @@
                                 <span asp-validation-for="DisplayDefaultFooterItemSettings.DisplayContactUsFooterItem"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <div class="col-md-3">
                                 <nop-override-store-checkbox asp-for="DisplayDefaultFooterItemSettings.DisplayProductSearchFooterItem_OverrideForStore" asp-input="DisplayDefaultFooterItemSettings.DisplayProductSearchFooterItem" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
@@ -330,7 +330,7 @@
                                 <nop-editor asp-for="DisplayDefaultFooterItemSettings.DisplayNewProductsFooterItem" />
                                 <span asp-validation-for="DisplayDefaultFooterItemSettings.DisplayNewProductsFooterItem"></span>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="form-group">
                             <div class="col-md-3">
                                 <nop-override-store-checkbox asp-for="DisplayDefaultFooterItemSettings.DisplayCustomerInfoFooterItem_OverrideForStore" asp-input="DisplayDefaultFooterItemSettings.DisplayCustomerInfoFooterItem" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
@@ -370,7 +370,7 @@
                                 <nop-editor asp-for="DisplayDefaultFooterItemSettings.DisplayShoppingCartFooterItem" />
                                 <span asp-validation-for="DisplayDefaultFooterItemSettings.DisplayShoppingCartFooterItem"></span>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="form-group">
                             <div class="col-md-3">
                                 <nop-override-store-checkbox asp-for="DisplayDefaultFooterItemSettings.DisplayWishlistFooterItem_OverrideForStore" asp-input="DisplayDefaultFooterItemSettings.DisplayWishlistFooterItem" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
@@ -393,7 +393,7 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         @T("Admin.Configuration.Settings.GeneralCommon.BlockTitle.SocialMedia")
@@ -695,7 +695,7 @@
                             <div class="col-md-3">
                                 <nop-label asp-for="SecuritySettings.EnableXsrfProtectionForPublicStore" />
                             </div>
-                            <div class="col-md-9"> 
+                            <div class="col-md-9">
                                 <nop-editor asp-for="SecuritySettings.EnableXsrfProtectionForPublicStore" />
                                 <span asp-validation-for="SecuritySettings.EnableXsrfProtectionForPublicStore"></span>
                             </div>
@@ -733,11 +733,11 @@
                         @T("Admin.Configuration.Settings.GeneralCommon.BlockTitle.Captcha")
                     </div>
                     <div class="panel-body">
-                       @T("Admin.Configuration.Settings.GeneralCommon.Captcha.Instructions")
+                        @T("Admin.Configuration.Settings.GeneralCommon.Captcha.Instructions")
                         <div class="form-group">
                             <div class="col-md-3">
                                 <nop-override-store-checkbox asp-for="CaptchaSettings.Enabled_OverrideForStore" asp-input="CaptchaSettings.Enabled" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
-                                <nop-label asp-for="CaptchaSettings.Enabled"/>
+                                <nop-label asp-for="CaptchaSettings.Enabled" />
                             </div>
                             <div class="col-md-9">
                                 <nop-editor asp-for="CaptchaSettings.Enabled" />
@@ -834,7 +834,7 @@
                                     <nop-editor asp-for="CaptchaSettings.ShowOnApplyVendorPage" />
                                     <span asp-validation-for="CaptchaSettings.ShowOnApplyVendorPage"></span>
                                 </div>
-                            </div>                            
+                            </div>
                             <div class="form-group" id="ssReCaptchaPublicKeypnl">
                                 <div class="col-md-3">
                                     <nop-override-store-checkbox asp-for="CaptchaSettings.ReCaptchaPublicKey_OverrideForStore" asp-input="CaptchaSettings.ReCaptchaPublicKey" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
@@ -886,6 +886,171 @@
                                 $('#ssCaptchaShowOnNewsCommentPagepnl').hide();
                                 $('#ssCaptchaShowOnProductReviewPagepnl').hide();
                                 $('#ssCaptchaShowOnApplyVendorPagepnl').hide();
+                                $('#ssReCaptchaPublicKeypnl').hide();
+                                $('#ssReCaptchaPrivateKeypnl').hide();
+                            }
+                        }
+                    </script>
+                </div>
+
+                <div class="panel panel-default advanced-setting">
+                    <div class="panel-heading">
+                        QQ验证码
+                    </div>
+                    <div class="panel-body">
+                        @T("Admin.Configuration.Settings.GeneralCommon.Captcha.Instructions")
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <nop-override-store-checkbox asp-for="QQCaptchaSettings.Enabled_OverrideForStore" asp-input="QQCaptchaSettings.Enabled" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                <nop-label asp-for="QQCaptchaSettings.Enabled" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="QQCaptchaSettings.Enabled" />
+                                <span asp-validation-for="QQCaptchaSettings.Enabled"></span>
+                            </div>
+                        </div>
+                        <nop-nested-setting asp-for="QQCaptchaSettings.Enabled">
+                            <div class="form-group" id="ssQQCaptchaShowOnLoginPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnLoginPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnLoginPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnLoginPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnLoginPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnLoginPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnRegistrationPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnRegistrationPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnRegistrationPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnRegistrationPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnRegistrationPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnRegistrationPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnContactUsPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnContactUsPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnContactUsPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnContactUsPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnContactUsPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnContactUsPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnEmailWishlistToFriendPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnEmailWishlistToFriendPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnEmailWishlistToFriendPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnEmailWishlistToFriendPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnEmailWishlistToFriendPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnEmailWishlistToFriendPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnEmailProductToFriendPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnEmailProductToFriendPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnEmailProductToFriendPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnEmailProductToFriendPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnEmailProductToFriendPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnEmailProductToFriendPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnBlogCommentPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnBlogCommentPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnBlogCommentPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnBlogCommentPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnBlogCommentPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnBlogCommentPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnNewsCommentPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnNewsCommentPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnNewsCommentPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnNewsCommentPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnNewsCommentPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnNewsCommentPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnProductReviewPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnProductReviewPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnProductReviewPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnProductReviewPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnProductReviewPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnProductReviewPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssQQCaptchaShowOnApplyVendorPagepnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.ShowOnApplyVendorPage_OverrideForStore" asp-input="QQCaptchaSettings.ShowOnApplyVendorPage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.ShowOnApplyVendorPage" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.ShowOnApplyVendorPage" />
+                                    <span asp-validation-for="QQCaptchaSettings.ShowOnApplyVendorPage"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssReCaptchaPublicKeypnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.AppId_OverrideForStore" asp-input="QQCaptchaSettings.AppId" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.AppId" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.AppId" />
+                                    <span asp-validation-for="QQCaptchaSettings.AppId"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ssReCaptchaPrivateKeypnl">
+                                <div class="col-md-3">
+                                    <nop-override-store-checkbox asp-for="QQCaptchaSettings.AppSecretKey_OverrideForStore" asp-input="QQCaptchaSettings.AppSecretKey" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                                    <nop-label asp-for="QQCaptchaSettings.AppSecretKey" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="QQCaptchaSettings.AppSecretKey" />
+                                    <span asp-validation-for="QQCaptchaSettings.AppSecretKey"></span>
+                                </div>
+                            </div>
+                        </nop-nested-setting>
+                    </div>
+                    <script>
+                        $(document).ready(function () {
+                            $("#@Html.IdFor(model => model.QQCaptchaSettings.Enabled)").click(toggleQQCaptcha);
+                            toggleQQCaptcha();
+                        });
+
+                        function toggleQQCaptcha() {
+                            if ($('#@Html.IdFor(model => model.QQCaptchaSettings.Enabled)').is(':checked')) {
+                                $('#ssQQCaptchaShowOnLoginPagepnl').show();
+                                $('#ssQQCaptchaShowOnRegistrationPagepnl').show();
+                                $('#ssQQCaptchaShowOnContactUsPagepnl').show();
+                                $('#ssQQCaptchaShowOnEmailWishlistToFriendPagepnl').show();
+                                $('#ssQQCaptchaShowOnEmailProductToFriendPagepnl').show();
+                                $('#ssQQCaptchaShowOnBlogCommentPagepnl').show();
+                                $('#ssQQCaptchaShowOnNewsCommentPagepnl').show();
+                                $('#ssQQCaptchaShowOnProductReviewPagepnl').show();
+                                $('#ssQQCaptchaShowOnApplyVendorPagepnl').show();
+                                $('#ssReCaptchaPublicKeypnl').show();
+                                $('#ssReCaptchaPrivateKeypnl').show();
+                            } else {
+                                $('#ssQQCaptchaShowOnLoginPagepnl').hide();
+                                $('#ssQQCaptchaShowOnRegistrationPagepnl').hide();
+                                $('#ssQQCaptchaShowOnContactUsPagepnl').hide();
+                                $('#ssQQCaptchaShowOnEmailWishlistToFriendPagepnl').hide();
+                                $('#ssQQCaptchaShowOnEmailProductToFriendPagepnl').hide();
+                                $('#ssQQCaptchaShowOnBlogCommentPagepnl').hide();
+                                $('#ssQQCaptchaShowOnNewsCommentPagepnl').hide();
+                                $('#ssQQCaptchaShowOnProductReviewPagepnl').hide();
+                                $('#ssQQCaptchaShowOnApplyVendorPagepnl').hide();
                                 $('#ssReCaptchaPublicKeypnl').hide();
                                 $('#ssReCaptchaPrivateKeypnl').hide();
                             }

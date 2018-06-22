@@ -37,6 +37,8 @@ namespace Nop.Web.Areas.Admin.Models.Settings
 
         public CaptchaSettingsModel CaptchaSettings { get; set; }
 
+        public QQCaptchaSettingsModel QQCaptchaSettings { get; set; }
+
         public PdfSettingsModel PdfSettings { get; set; }
 
         public LocalizationSettingsModel LocalizationSettings { get; set; }

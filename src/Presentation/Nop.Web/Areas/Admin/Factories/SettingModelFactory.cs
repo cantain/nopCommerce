@@ -438,6 +438,22 @@ namespace Nop.Web.Areas.Admin.Factories
         }
 
         /// <summary>
+        /// Prepare qq captcha settings model
+        /// </summary>
+        /// <returns>Captcha settings model</returns>
+        protected virtual QQCaptchaSettingsModel PrepareQQCaptchaSettingsModel()
+        {
+            //load settings for a chosen store scope
+            var storeId = _storeContext.ActiveStoreScopeConfiguration;
+            var captchaSettings = _settingService.LoadSetting<QQCaptchaSettings>(storeId);
+
+            //fill in model values from the entity
+            var model = captchaSettings.ToSettingsModel<QQCaptchaSettingsModel>();
+
+            return model;
+        }
+
+        /// <summary>
         /// Prepare PDF settings model
         /// </summary>
         /// <returns>PDF settings model</returns>
@@ -1339,6 +1355,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare captcha settings model
             model.CaptchaSettings = PrepareCaptchaSettingsModel();
+
+            //prepare qq captcha settings model
+            model.QQCaptchaSettings = PrepareQQCaptchaSettingsModel();
 
             //prepare PDF settings model
             model.PdfSettings = PreparePdfSettingsModel();

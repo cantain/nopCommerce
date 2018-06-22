@@ -3,21 +3,22 @@
 @using Nop.Core
 @inject IWebHelper webHelper
 @{
-    //Layout = "_ColumnsOne";
-    Layout = "_Root.Head";
+                //Layout = "_ColumnsOne";
+                Layout = "_Root.Head";
 
-    //title
-    Html.AddTitleParts(T("PageTitle.Login").Text);
-    //page class
-    Html.AppendPageCssClassParts("html-login-page");
+                //title
+                Html.AddTitleParts(T("PageTitle.Login").Text);
+                //page class
+                Html.AppendPageCssClassParts("html-login-page");
+
 
     //register URL with return URL (if specified)
     var registerUrl = Url.RouteUrl("Register");
     if (!string.IsNullOrEmpty(this.Context.Request.Query["returnUrl"]))
     {
         registerUrl = webHelper.ModifyQueryString(registerUrl, "returnurl=" + WebUtility.UrlEncode(this.Context.Request.Query["returnUrl"]), null);
-    }
-}
+            }
+        }
 <div class="page login-page">
     <div class="page-title">
 
@@ -28,7 +29,7 @@
     <div class="page-body">
         <div class="customer-blocks">
             @if (Model.CheckoutAsGuest)
-            {
+        {
                 <div class="new-wrapper checkout-as-guest-or-register-block">
                     <div class="title">
                         <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
@@ -57,17 +58,17 @@
                 </div>
             }
             <div class="returning-wrapper fieldset" >
-                <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post">
+                <form asp-route="Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" id="form1">
                     <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
                     <div class="title">
                         <strong>老用户</strong>
                     </div>
                     <div class="form-fields" >
                         @if (Model.UsernamesEnabled)
-                        {
+    {
                             <div class="inputs">
                                 <label asp-for="Username" asp-postfix=":"></label>
-                                <input asp-for="Username" class="username" autofocus="autofocus" />
+                                <input asp-for="Username" class="username" autofocus="autofocus"  />
                                 <span asp-validation-for="Username"></span>
                             </div>
                         }
@@ -92,16 +93,41 @@
                             </span>
                         </div>
                         @if (Model.DisplayCaptcha)
-                        {
+    {
                             <div class="captcha-box">
                                 <nop-captcha />
                             </div>
                         }
+
+                        <nop-qq-captcha asp-qq-captcha-callback="callback" />
                     </div>
-                    <div class="buttons" >
-                        <input class="button-1 login-button" type="submit" value="@T("Account.Login.LoginButton")" />
+                    <div class="buttons">
+                        <input class="button-1 login-button" onclick="" type="submit" value="@T("Account.Login.LoginButton")" />
                     </div>
                 </form>
+                <script>
+                    var clickbysumbmit = false;
+                    function callback(res) {
+                        console.log(res);
+                        if (res.ret === 0 && clickbysumbmit) {
+                            $("form").submit();
+                        }
+                        clickbysumbmit = false;
+                    }
+                    window.onload = function () {
+                        var myform = document.getElementById('form1');
+                        
+                        myform.onsubmit = function () {
+                            var ticket = $("input[name='qq_captcha_ticket_field']").val();
+                            if (ticket == "") {
+                                clickbysumbmit = true;
+                                $("#TencentCaptcha").trigger("click");
+                                return false;
+                            }
+                            return true;
+                        }
+                    } 
+                </script>
             </div>
         </div>
         @*<div class="external-authentication">

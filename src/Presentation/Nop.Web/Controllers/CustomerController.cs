@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -88,6 +90,7 @@ namespace Nop.Web.Controllers
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
         private readonly CaptchaSettings _captchaSettings;
+        private readonly QQCaptchaSettings _qqCaptchaSettings;
         private readonly GdprSettings _gdprSettings;
         private readonly StoreInformationSettings _storeInformationSettings;
 
@@ -133,6 +136,7 @@ namespace Nop.Web.Controllers
             IWorkflowMessageService workflowMessageService,
             LocalizationSettings localizationSettings,
             CaptchaSettings captchaSettings,
+            QQCaptchaSettings qqCaptchaSettings,
             GdprSettings gdprSettings,
             StoreInformationSettings storeInformationSettings)
         {
@@ -174,6 +178,7 @@ namespace Nop.Web.Controllers
             this._workflowMessageService = workflowMessageService;
             this._localizationSettings = localizationSettings;
             this._captchaSettings = captchaSettings;
+            this._qqCaptchaSettings = qqCaptchaSettings;
             this._gdprSettings = gdprSettings;
             this._storeInformationSettings = storeInformationSettings;
         }
@@ -280,6 +285,7 @@ namespace Nop.Web.Controllers
 
         [HttpPost]
         [ValidateCaptcha]
+        [ValidateQQCaptcha]
         //available even when a store is closed
         [CheckAccessClosedStore(true)]
         //available even when navigation is not allowed
@@ -291,6 +297,12 @@ namespace Nop.Web.Controllers
             if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
             {
                 ModelState.AddModelError("", _captchaSettings.GetWrongCaptchaMessage(_localizationService));
+            }
+
+            //validate CAPTCHA
+            if (_qqCaptchaSettings.Enabled && _qqCaptchaSettings.ShowOnLoginPage && !captchaValid)
+            {
+                ModelState.AddModelError("", "验证码未通过");
             }
 
             if (ModelState.IsValid)
@@ -564,6 +576,7 @@ namespace Nop.Web.Controllers
 
         [HttpPost]
         [ValidateCaptcha]
+        [ValidateQQCaptcha]
         [ValidateHoneypot]
         [PublicAntiForgery]
         //available even when navigation is not allowed
@@ -600,6 +613,12 @@ namespace Nop.Web.Controllers
             if (_captchaSettings.Enabled && _captchaSettings.ShowOnRegistrationPage && !captchaValid)
             {
                 ModelState.AddModelError("", _captchaSettings.GetWrongCaptchaMessage(_localizationService));
+            }
+
+            //validate CAPTCHA
+            if (_qqCaptchaSettings.Enabled && _qqCaptchaSettings.ShowOnLoginPage && !captchaValid)
+            {
+                ModelState.AddModelError("", "验证码未通过");
             }
 
             if (ModelState.IsValid)

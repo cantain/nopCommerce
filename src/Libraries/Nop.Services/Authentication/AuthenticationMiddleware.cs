@@ -68,13 +68,27 @@ namespace Nop.Services.Authentication
                 catch { continue; }
             }
 
-            var defaultAuthenticate = await Schemes.GetDefaultAuthenticateSchemeAsync();
-            if (defaultAuthenticate != null)
+            //var defaultAuthenticate = await Schemes.GetDefaultAuthenticateSchemeAsync();
+            //if (defaultAuthenticate != null)
+            //{
+            //    var result = await context.AuthenticateAsync(defaultAuthenticate.Name);
+            //    if (result?.Principal != null)
+            //    {
+            //        context.User = result.Principal;
+            //    }
+            //}
+
+            var auths = await Schemes.GetAllSchemesAsync();
+            foreach (var auth in auths)
             {
-                var result = await context.AuthenticateAsync(defaultAuthenticate.Name);
-                if (result?.Principal != null)
+                if (auth != null)
                 {
-                    context.User = result.Principal;
+                    var result = await context.AuthenticateAsync(auth.Name);
+                    if (result?.Principal != null)
+                    {
+                        context.User = result.Principal;
+                        break;
+                    }
                 }
             }
 

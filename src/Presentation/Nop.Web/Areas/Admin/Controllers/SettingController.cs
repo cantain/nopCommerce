@@ -1258,6 +1258,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             captchaSettings.ReCaptchaPublicKey = model.CaptchaSettings.ReCaptchaPublicKey;
             captchaSettings.ReCaptchaPrivateKey = model.CaptchaSettings.ReCaptchaPrivateKey;
 
+
             //we do not clear cache after each setting update.
             //this behavior can increase performance because cached settings will not be cleared 
             //and loaded from database after each update
@@ -1274,6 +1275,37 @@ namespace Nop.Web.Areas.Admin.Controllers
             _settingService.SaveSettingOverridablePerStore(captchaSettings, x => x.ReCaptchaPublicKey, model.CaptchaSettings.ReCaptchaPublicKey_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(captchaSettings, x => x.ReCaptchaPrivateKey, model.CaptchaSettings.ReCaptchaPrivateKey_OverrideForStore, storeScope, false);
 
+            //captcha settings
+            var qqCaptchaSettings = _settingService.LoadSetting<QQCaptchaSettings>(storeScope);
+            qqCaptchaSettings.Enabled = model.QQCaptchaSettings.Enabled;
+            qqCaptchaSettings.ShowOnLoginPage = model.QQCaptchaSettings.ShowOnLoginPage;
+            qqCaptchaSettings.ShowOnRegistrationPage = model.QQCaptchaSettings.ShowOnRegistrationPage;
+            qqCaptchaSettings.ShowOnContactUsPage = model.QQCaptchaSettings.ShowOnContactUsPage;
+            qqCaptchaSettings.ShowOnEmailWishlistToFriendPage = model.QQCaptchaSettings.ShowOnEmailWishlistToFriendPage;
+            qqCaptchaSettings.ShowOnEmailProductToFriendPage = model.QQCaptchaSettings.ShowOnEmailProductToFriendPage;
+            qqCaptchaSettings.ShowOnBlogCommentPage = model.QQCaptchaSettings.ShowOnBlogCommentPage;
+            qqCaptchaSettings.ShowOnNewsCommentPage = model.QQCaptchaSettings.ShowOnNewsCommentPage;
+            qqCaptchaSettings.ShowOnProductReviewPage = model.QQCaptchaSettings.ShowOnProductReviewPage;
+            qqCaptchaSettings.ShowOnApplyVendorPage = model.QQCaptchaSettings.ShowOnApplyVendorPage;
+            qqCaptchaSettings.Aid = model.QQCaptchaSettings.AppId;
+            qqCaptchaSettings.AppSecretKey = model.QQCaptchaSettings.AppSecretKey;
+
+            //we do not clear cache after each setting update.
+            //this behavior can increase performance because cached settings will not be cleared 
+            //and loaded from database after each update
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.Enabled, model.CaptchaSettings.Enabled_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnLoginPage, model.CaptchaSettings.ShowOnLoginPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnRegistrationPage, model.CaptchaSettings.ShowOnRegistrationPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnContactUsPage, model.CaptchaSettings.ShowOnContactUsPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnEmailWishlistToFriendPage, model.CaptchaSettings.ShowOnEmailWishlistToFriendPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnEmailProductToFriendPage, model.CaptchaSettings.ShowOnEmailProductToFriendPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnBlogCommentPage, model.CaptchaSettings.ShowOnBlogCommentPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnNewsCommentPage, model.CaptchaSettings.ShowOnNewsCommentPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnProductReviewPage, model.CaptchaSettings.ShowOnProductReviewPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.ShowOnApplyVendorPage, model.CaptchaSettings.ShowOnApplyVendorPage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.Aid, model.CaptchaSettings.ReCaptchaPublicKey_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(qqCaptchaSettings, x => x.AppSecretKey, model.CaptchaSettings.ReCaptchaPrivateKey_OverrideForStore, storeScope, false);
+
             // now clear settings cache
             _settingService.ClearCache();
 
@@ -1282,6 +1314,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 //captcha is enabled but the keys are not entered
                 ErrorNotification(_localizationService.GetResource("Admin.Configuration.Settings.GeneralCommon.CaptchaAppropriateKeysNotEnteredError"));
+            }
+
+            if (qqCaptchaSettings.Enabled &&
+                (string.IsNullOrWhiteSpace(qqCaptchaSettings.Aid) || string.IsNullOrWhiteSpace(qqCaptchaSettings.AppSecretKey)))
+            {
+                //captcha is enabled but the keys are not entered
+                ErrorNotification("AppId 和 AppSecretKey不能为空");
             }
 
             //PDF settings
