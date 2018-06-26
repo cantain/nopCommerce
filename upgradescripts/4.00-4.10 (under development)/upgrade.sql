@@ -1234,6 +1234,12 @@ set @resources='
   </LocaleResource>
   <LocaleResource Name="ShoppingCart.GiftCardCouponCode.Label">
     <Value>Enter gift card code</Value>
+  </LocaleResource>	
+  <LocaleResource Name="Admin.System.Warnings.PluginNotEnabled">
+    <Value>You could uninstall and remove the plugin(s) which you don''t use, this might increase performance</Value>
+  </LocaleResource>  
+  <LocaleResource Name="Admin.System.Warnings.Errors">
+    <Value>The store has some error(s) or warning(s). Please find more information on the Warnings page.</Value>
   </LocaleResource>
 </Language>
 '
@@ -3042,5 +3048,13 @@ IF NOT EXISTS (SELECT 1 FROM [Setting] WHERE [name] = N'customersettings.allowcu
 BEGIN
 	INSERT [Setting] ([Name], [Value], [StoreId])
 	VALUES (N'customersettings.allowcustomerstocheckgiftcardbalance', N'false', 0)
+END
+GO
+
+--new setting
+IF NOT EXISTS (SELECT 1 FROM [Setting] WHERE [name] = N'adminareasettings.checkcopyrightremovalkey')
+BEGIN
+	INSERT [Setting] ([Name], [Value], [StoreId])
+	VALUES (N'adminareasettings.checkcopyrightremovalkey', N'true', 0)
 END
 GO

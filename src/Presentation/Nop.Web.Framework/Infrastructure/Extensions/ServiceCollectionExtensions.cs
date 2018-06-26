@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -41,9 +40,9 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         /// Add services to the application and configure service provider
         /// </summary>
         /// <param name="services">Collection of service descriptors</param>
-        /// <param name="configuration">Configuration root of the application</param>
+        /// <param name="configuration">Configuration of the application</param>
         /// <returns>Configured service provider</returns>
-        public static IServiceProvider ConfigureApplicationServices(this IServiceCollection services, IConfigurationRoot configuration)
+        public static IServiceProvider ConfigureApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             //add NopConfig configuration parameters
             services.ConfigureStartupConfig<NopConfig>(configuration.GetSection("Nop"));
@@ -297,13 +296,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         {
             services.AddDbContext<NopObjectContext>(optionsBuilder =>
             {
-                var dataSettings = DataSettingsManager.LoadSettings();
-                if (!dataSettings?.IsValid ?? true)
-                    return;
-
-                optionsBuilder
-                    .UseLazyLoadingProxies()
-                    .UseSqlServer(dataSettings.DataConnectionString);
+                optionsBuilder.UseSqlServerWithLazyLoading(services);
             });
         }
 
