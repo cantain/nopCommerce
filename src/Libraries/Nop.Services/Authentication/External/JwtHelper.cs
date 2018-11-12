@@ -42,5 +42,32 @@ namespace Nop.Services.Authentication.External
             SecurityToken token = tokenHandler.CreateToken(descriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public static ClaimsPrincipal ValidateToken(string token)
+        {
+            var jwtConfig = EngineContext.Current.Resolve<JwtConfig>();
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            SecurityKey key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.JwtSecret));
+            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var param = new TokenValidationParameters()
+            {
+                // The signing key must match!
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+
+                // Validate the JWT Issuer (iss) claim
+                ValidateIssuer = true,
+                ValidIssuer = jwtConfig.Issuer,
+
+                // Validate the JWT Audience (aud) claim
+                ValidateAudience = true,
+                ValidAudience = jwtConfig.Audience,
+
+                // Validate the token expiry
+                ValidateLifetime = false,
+            };
+            var result = tokenHandler.ValidateToken(token, param, out SecurityToken validatedToken);
+            return result;
+        }
     }
 }

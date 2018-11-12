@@ -1,4 +1,5 @@
 ﻿using System;
+using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,17 @@ namespace Nop.Web
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public void Configure(IApplicationBuilder application)
         {
+            var url = Configuration["Exceptionless:ServerUrl"];
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                ExceptionlessClient.Default.Configuration.ServerUrl = url;
+            }
+            if (!string.IsNullOrEmpty(Configuration["Exceptionless:ApiKey"]))
+            {
+                application.UseExceptionless(Configuration["Exceptionless:ApiKey"]);
+            }
+           
             application.ConfigureRequestPipeline();
         }
     }
