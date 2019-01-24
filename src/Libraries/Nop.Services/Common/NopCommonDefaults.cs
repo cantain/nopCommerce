@@ -1,5 +1,4 @@
-﻿
-namespace Nop.Services.Common
+﻿namespace Nop.Services.Common
 {
     /// <summary>
     /// Represents default values related to common services
@@ -46,6 +45,14 @@ namespace Nop.Services.Common
         /// Gets a key pattern to clear cache
         /// </summary>
         public static string AddressAttributeValuesPatternCacheKey => "Nop.addressattributevalue.";
+
+        /// <summary>
+        /// Gets a name of the custom address attribute control
+        /// </summary>
+        /// <remarks>
+        /// {0} : address attribute id
+        /// </remarks>
+        public static string AddressAttributeControlName => "address_attribute_{0}";
 
         #endregion
 
@@ -95,6 +102,25 @@ namespace Nop.Services.Common
         /// Gets a database backup file extension
         /// </summary>
         public static string DbBackupFileExtension => "bak";
+
+        #endregion
+
+        #region Favicon and app icons
+
+        /// <summary>
+        /// Gets a name of the file with code for the head element
+        /// </summary>
+        public static string HeadCodeFileName => "html_code.html";
+
+        /// <summary>
+        /// Gets a path to the favicon and app icons
+        /// </summary>
+        public static string FaviconAndAppIconsPath => "icons\\icons_{0}";
+
+        /// <summary>
+        /// Gets a name of the old favicon icon for current store
+        /// </summary>
+        public static string OldFaviconIconName => "favicon-{0}.ico";
 
         #endregion
     }

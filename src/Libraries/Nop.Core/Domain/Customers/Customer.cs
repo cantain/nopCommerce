@@ -17,10 +17,7 @@ namespace Nop.Core.Domain.Customers
         private ICollection<ReturnRequest> _returnRequests;
         protected ICollection<CustomerAddressMapping> _customerAddressMappings;
         private IList<CustomerRole> _customerRoles;
-		
-        /// <summary>
-        /// Ctor
-        /// </summary>
+
         public Customer()
         {
             this.CustomerGuid = Guid.NewGuid();
@@ -214,6 +211,30 @@ namespace Nop.Core.Domain.Customers
         {
             get => _customerAddressMappings ?? (_customerAddressMappings = new List<CustomerAddressMapping>());
             protected set => _customerAddressMappings = value;
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Add customer role and reset customer roles cache
+        /// </summary>
+        /// <param name="role">Role</param>
+        public void AddCustomerRoleMapping(CustomerCustomerRoleMapping role)
+        {
+            CustomerCustomerRoleMappings.Add(role);
+            _customerRoles = null;
+        }
+
+        /// <summary>
+        /// Remove customer role and reset customer roles cache
+        /// </summary>
+        /// <param name="role">Role</param>
+        public void RemoveCustomerRoleMapping(CustomerCustomerRoleMapping role)
+        {
+            CustomerCustomerRoleMappings.Remove(role);
+            _customerRoles = null;
         }
 
         #endregion

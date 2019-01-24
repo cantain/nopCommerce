@@ -1,5 +1,4 @@
-﻿
-namespace Nop.Services.Customers
+﻿namespace Nop.Services.Customers
 {
     /// <summary>
     /// Represents default values related to customer services
@@ -91,5 +90,10 @@ namespace Nop.Services.Customers
         /// Gets a max username length
         /// </summary>
         public static int CustomerUsernameLength => 100;
+
+        /// <summary>
+        /// Gets a default hash format for customer password
+        /// </summary>
+        public static string DefaultHashedPasswordFormat => "SHA512";
     }
 }

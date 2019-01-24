@@ -33,6 +33,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IGiftCardService _giftCardService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
         private readonly IPriceFormatter _priceFormatter;
         private readonly IWorkflowMessageService _workflowMessageService;
@@ -50,6 +51,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IGiftCardService giftCardService,
             ILanguageService languageService,
             ILocalizationService localizationService,
+            INotificationService notificationService,
             IPermissionService permissionService,
             IPriceFormatter priceFormatter,
             IWorkflowMessageService workflowMessageService,
@@ -63,6 +65,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._giftCardService = giftCardService;
             this._languageService = languageService;
             this._localizationService = localizationService;
+            this._notificationService = notificationService;
             this._permissionService = permissionService;
             this._priceFormatter = priceFormatter;
             this._workflowMessageService = workflowMessageService;
@@ -128,7 +131,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _customerActivityService.InsertActivity("AddNewGiftCard",
                     string.Format(_localizationService.GetResource("ActivityLog.AddNewGiftCard"), giftCard.GiftCardCouponCode), giftCard);
 
-                SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Added"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Added"));
 
                 return continueEditing ? RedirectToAction("Edit", new { id = giftCard.Id }) : RedirectToAction("List");
             }
@@ -169,7 +172,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             model.PurchasedWithOrderId = giftCard.PurchasedWithOrderItem != null ? (int?)giftCard.PurchasedWithOrderItem.OrderId : null;
-            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftCard.GetGiftCardRemainingAmount(), true, false);
+            model.RemainingAmountStr = _priceFormatter.FormatPrice(_giftCardService.GetGiftCardRemainingAmount(giftCard), true, false);
             model.AmountStr = _priceFormatter.FormatPrice(giftCard.Amount, true, false);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(giftCard.CreatedOnUtc, DateTimeKind.Utc);
             model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId).CurrencyCode;
@@ -184,7 +187,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _customerActivityService.InsertActivity("EditGiftCard",
                     string.Format(_localizationService.GetResource("ActivityLog.EditGiftCard"), giftCard.GiftCardCouponCode), giftCard);
 
-                SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Updated"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Updated"));
 
                 if (!continueEditing)
                     return RedirectToAction("List");
@@ -222,7 +225,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             model = giftCard.ToModel(model);
             model.PurchasedWithOrderId = giftCard.PurchasedWithOrderItem != null ? (int?)giftCard.PurchasedWithOrderItem.OrderId : null;
-            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftCard.GetGiftCardRemainingAmount(), true, false);
+            model.RemainingAmountStr = _priceFormatter.FormatPrice(_giftCardService.GetGiftCardRemainingAmount(giftCard), true, false);
             model.AmountStr = _priceFormatter.FormatPrice(giftCard.Amount, true, false);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(giftCard.CreatedOnUtc, DateTimeKind.Utc);
             model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId).CurrencyCode;
@@ -261,7 +264,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
             catch (Exception exc)
             {
-                ErrorNotification(exc, false);
+                _notificationService.ErrorNotification(exc);
             }
 
             return View(model);
@@ -284,7 +287,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _customerActivityService.InsertActivity("DeleteGiftCard",
                 string.Format(_localizationService.GetResource("ActivityLog.DeleteGiftCard"), giftCard.GiftCardCouponCode), giftCard);
 
-            SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Deleted"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.GiftCards.Deleted"));
 
             return RedirectToAction("List");
         }

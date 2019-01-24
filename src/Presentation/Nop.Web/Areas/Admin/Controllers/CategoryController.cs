@@ -12,6 +12,7 @@ using Nop.Services.Discounts;
 using Nop.Services.ExportImport;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Nop.Services.Messages;
 using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Seo;
@@ -39,6 +40,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IImportManager _importManager;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
         private readonly IPictureService _pictureService;
         private readonly IProductService _productService;
@@ -61,6 +63,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IImportManager importManager,
             ILocalizationService localizationService,
             ILocalizedEntityService localizedEntityService,
+            INotificationService notificationService,
             IPermissionService permissionService,
             IPictureService pictureService,
             IProductService productService,
@@ -79,6 +82,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             this._importManager = importManager;
             this._localizationService = localizationService;
             this._localizedEntityService = localizedEntityService;
+            this._notificationService = notificationService;
             this._permissionService = permissionService;
             this._pictureService = pictureService;
             this._productService = productService;
@@ -122,7 +126,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     localized.LanguageId);
 
                 //search engine name
-                var seName = category.ValidateSeName(localized.SeName, localized.Name, false);
+                var seName = _urlRecordService.ValidateSeName(category, localized.SeName, localized.Name, false);
                 _urlRecordService.SaveSlug(category, seName, localized.LanguageId);
             }
         }
@@ -243,7 +247,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _categoryService.InsertCategory(category);
 
                 //search engine name
-                model.SeName = category.ValidateSeName(model.SeName, category.Name, true);
+                model.SeName = _urlRecordService.ValidateSeName(category, model.SeName, category.Name, true);
                 _urlRecordService.SaveSlug(category, model.SeName, 0);
 
                 //locales
@@ -273,7 +277,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _customerActivityService.InsertActivity("AddNewCategory",
                     string.Format(_localizationService.GetResource("ActivityLog.AddNewCategory"), category.Name), category);
 
-                SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Added"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Added"));
 
                 if (!continueEditing)
                     return RedirectToAction("List");
@@ -327,7 +331,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _categoryService.UpdateCategory(category);
 
                 //search engine name
-                model.SeName = category.ValidateSeName(model.SeName, category.Name, true);
+                model.SeName = _urlRecordService.ValidateSeName(category, model.SeName, category.Name, true);
                 _urlRecordService.SaveSlug(category, model.SeName, 0);
 
                 //locales
@@ -375,7 +379,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _customerActivityService.InsertActivity("EditCategory",
                     string.Format(_localizationService.GetResource("ActivityLog.EditCategory"), category.Name), category);
 
-                SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Updated"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Updated"));
 
                 if (!continueEditing)
                     return RedirectToAction("List");
@@ -410,7 +414,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _customerActivityService.InsertActivity("DeleteCategory",
                 string.Format(_localizationService.GetResource("ActivityLog.DeleteCategory"), category.Name), category);
 
-            SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Deleted"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Deleted"));
 
             return RedirectToAction("List");
         }
@@ -432,7 +436,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
             catch (Exception exc)
             {
-                ErrorNotification(exc);
+                _notificationService.ErrorNotification(exc);
                 return RedirectToAction("List");
             }
         }
@@ -451,7 +455,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
             catch (Exception exc)
             {
-                ErrorNotification(exc);
+                _notificationService.ErrorNotification(exc);
                 return RedirectToAction("List");
             }
         }
@@ -474,17 +478,17 @@ namespace Nop.Web.Areas.Admin.Controllers
                 }
                 else
                 {
-                    ErrorNotification(_localizationService.GetResource("Admin.Common.UploadFile"));
+                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.Common.UploadFile"));
                     return RedirectToAction("List");
                 }
 
-                SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Imported"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Categories.Imported"));
 
                 return RedirectToAction("List");
             }
             catch (Exception exc)
             {
-                ErrorNotification(exc);
+                _notificationService.ErrorNotification(exc);
                 return RedirectToAction("List");
             }
         }
@@ -518,8 +522,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             var productCategory = _categoryService.GetProductCategoryById(model.Id)
                 ?? throw new ArgumentException("No product category mapping found with the specified id");
 
-            productCategory.IsFeaturedProduct = model.IsFeaturedProduct;
-            productCategory.DisplayOrder = model.DisplayOrder;
+            //fill entity from product
+            productCategory = model.ToEntity(productCategory);
             _categoryService.UpdateProductCategory(productCategory);
 
             return new NullJsonResult();
@@ -577,7 +581,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 foreach (var product in selectedProducts)
                 {
                     //whether product category with such parameters already exists
-                    if (existingProductCategories.FindProductCategory(product.Id, model.CategoryId) != null)
+                    if (_categoryService.FindProductCategory(existingProductCategories, product.Id, model.CategoryId) != null)
                         continue;
 
                     //insert the new product category mapping
@@ -592,7 +596,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
 
             ViewBag.RefreshPage = true;
-            
+
             return View(new AddProductToCategorySearchModel());
         }
 

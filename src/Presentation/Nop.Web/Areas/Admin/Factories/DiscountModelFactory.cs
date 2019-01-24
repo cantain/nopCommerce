@@ -14,6 +14,7 @@ using Nop.Services.Discounts;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
+using Nop.Services.Seo;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Models.Discounts;
@@ -39,8 +40,8 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IOrderService _orderService;
         private readonly IPriceFormatter _priceFormatter;
         private readonly IProductService _productService;
+        private readonly IUrlRecordService _urlRecordService;
         private readonly IWebHelper _webHelper;
-        private readonly IWorkContext _workContext;
 
         #endregion
 
@@ -57,8 +58,8 @@ namespace Nop.Web.Areas.Admin.Factories
             IOrderService orderService,
             IPriceFormatter priceFormatter,
             IProductService productService,
-            IWebHelper webHelper,
-            IWorkContext workContext)
+            IUrlRecordService urlRecordService,
+            IWebHelper webHelper)
         {
             this._currencySettings = currencySettings;
             this._baseAdminModelFactory = baseAdminModelFactory;
@@ -71,8 +72,8 @@ namespace Nop.Web.Areas.Admin.Factories
             this._orderService = orderService;
             this._priceFormatter = priceFormatter;
             this._productService = productService;
+            this._urlRecordService = urlRecordService;
             this._webHelper = webHelper;
-            this._workContext = workContext;
         }
 
         #endregion
@@ -226,7 +227,7 @@ namespace Nop.Web.Areas.Admin.Factories
                     var discountModel = discount.ToModel<DiscountModel>();
 
                     //fill in additional values (not existing in the entity)
-                    discountModel.DiscountTypeName = discount.DiscountType.GetLocalizedEnum(_localizationService, _workContext);
+                    discountModel.DiscountTypeName = _localizationService.GetLocalizedEnum(discount.DiscountType);
                     discountModel.PrimaryStoreCurrencyCode = _currencyService
                         .GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId)?.CurrencyCode;
                     discountModel.TimesUsed = _discountService.GetAllDiscountUsageHistory(discount.Id, pageSize: 1).TotalCount;
@@ -354,7 +355,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
                 requirementModel.RuleName = requirementRule.PluginDescriptor.FriendlyName;
                 requirementModel
-                    .ConfigurationUrl = $"{_webHelper.GetStoreLocation()}{requirementRule.GetConfigurationUrl(discount.Id, requirement.Id)}";
+                    .ConfigurationUrl = requirementRule.GetConfigurationUrl(discount.Id, requirement.Id);
 
                 return requirementModel;
             }).ToList();
@@ -385,13 +386,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 Data = history.Select(historyEntry =>
                 {
                     //fill in model values from the entity
-                    var discountUsageHistoryModel = new DiscountUsageHistoryModel
-                    {
-                        Id = historyEntry.Id,
-                        DiscountId = historyEntry.DiscountId,
-                        OrderId = historyEntry.OrderId
-                    };
-
+                    var discountUsageHistoryModel = historyEntry.ToModel<DiscountUsageHistoryModel>();
+                    
                     //convert dates to the user time
                     discountUsageHistoryModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -434,10 +430,13 @@ namespace Nop.Web.Areas.Admin.Factories
             var model = new DiscountProductListModel
             {
                 //fill in model values from the entity
-                Data = discountProducts.Select(product => new DiscountProductModel
+                Data = discountProducts.Select(product =>
                 {
-                    ProductId = product.Id,
-                    ProductName = product.Name
+                    var discountProductModel = product.ToModel<DiscountProductModel>();
+                    discountProductModel.ProductId = product.Id;
+                    discountProductModel.ProductName = product.Name;
+
+                    return discountProductModel;
                 }),
                 Total = discountProducts.TotalCount
             };
@@ -500,7 +499,13 @@ namespace Nop.Web.Areas.Admin.Factories
             var model = new AddProductToDiscountListModel
             {
                 //fill in model values from the entity
-                Data = products.Select(product => product.ToModel<ProductModel>()),
+                Data = products.Select(product =>
+                {
+                    var productModel = product.ToModel<ProductModel>();
+                    productModel.SeName = _urlRecordService.GetSeName(product, 0, true, false);
+
+                    return productModel;
+                }),
                 Total = products.TotalCount
             };
 
@@ -530,11 +535,16 @@ namespace Nop.Web.Areas.Admin.Factories
             var model = new DiscountCategoryListModel
             {
                 //fill in model values from the entity
-                Data = discountCategories.Select(category => new DiscountCategoryModel
+                Data = discountCategories.Select(category => 
                 {
-                    CategoryId = category.Id,
-                    CategoryName = category.GetFormattedBreadCrumb(_categoryService)
+                    var discountCategoryModel = category.ToModel<DiscountCategoryModel>();
+
+                    discountCategoryModel.CategoryName = _categoryService.GetFormattedBreadCrumb(category);
+                    discountCategoryModel.CategoryId = category.Id;
+
+                    return discountCategoryModel;
                 }),
+
                 Total = discountCategories.TotalCount
             };
 
@@ -581,7 +591,8 @@ namespace Nop.Web.Areas.Admin.Factories
                     var categoryModel = category.ToModel<CategoryModel>();
 
                     //fill in additional values (not existing in the entity)
-                    categoryModel.Breadcrumb = category.GetFormattedBreadCrumb(_categoryService);
+                    categoryModel.Breadcrumb = _categoryService.GetFormattedBreadCrumb(category);
+                    categoryModel.SeName = _urlRecordService.GetSeName(category, 0, true, false);
 
                     return categoryModel;
                 }),
@@ -615,10 +626,13 @@ namespace Nop.Web.Areas.Admin.Factories
             var model = new DiscountManufacturerListModel
             {
                 //fill in model values from the entity
-                Data = discountManufacturers.Select(manufacturer => new DiscountManufacturerModel
+                Data = discountManufacturers.Select(manufacturer =>
                 {
-                    ManufacturerId = manufacturer.Id,
-                    ManufacturerName = manufacturer.Name
+                    var discountManufacturerModel = manufacturer.ToModel<DiscountManufacturerModel>();
+                    discountManufacturerModel.ManufacturerId = manufacturer.Id;
+                    discountManufacturerModel.ManufacturerName = manufacturer.Name;
+
+                    return discountManufacturerModel;
                 }),
                 Total = discountManufacturers.TotalCount
             };
@@ -661,7 +675,13 @@ namespace Nop.Web.Areas.Admin.Factories
             var model = new AddManufacturerToDiscountListModel
             {
                 //fill in model values from the entity
-                Data = manufacturers.Select(manufacturer => manufacturer.ToModel<ManufacturerModel>()),
+                Data = manufacturers.Select(manufacturer =>
+                {
+                    var manufacturerModel = manufacturer.ToModel<ManufacturerModel>();
+                    manufacturerModel.SeName = _urlRecordService.GetSeName(manufacturer, 0, true, false);
+
+                    return manufacturerModel;
+                }),
                 Total = manufacturers.TotalCount
             };
 

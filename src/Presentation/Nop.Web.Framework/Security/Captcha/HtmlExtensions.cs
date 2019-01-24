@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
@@ -30,16 +31,21 @@ namespace Nop.Web.Framework.Security.Captcha
                 //this list got from this site: https://developers.google.com/recaptcha/docs/language, but we use languages only with two letters in the code
                 var supportedLanguageCodes = new List<string> { "af", "am", "ar", "az", "bg", "bn", "ca", "cs", "da", "de", "el", "en", "es", "et", "eu", "fa", "fi", "fil", "fr", "gl", "gu", "hi", "hr", "hu", "hy", "id", "is", "it", "iw", "ja", "ka", "kn", "ko", "lo", "lt", "lv", "ml", "mn", "mr", "ms", "nl", "no", "pl", "pt", "ro", "ru", "si", "sk", "sl", "sr", "sv", "sw", "ta", "te", "th", "tr", "uk", "ur", "vi", "zu" };
 
-                var twoLetterIsoCode = workContext.WorkingLanguage?.GetTwoLetterIsoLanguageName().ToLower() ?? string.Empty;
+                var languageService = EngineContext.Current.Resolve<ILanguageService>();
+                var twoLetterIsoCode = workContext.WorkingLanguage != null
+                    ? languageService.GetTwoLetterIsoLanguageName(workContext.WorkingLanguage).ToLower() 
+                    : string.Empty;
 
                 lang = supportedLanguageCodes.Contains(twoLetterIsoCode) ? twoLetterIsoCode : lang;
             }
+
+            var randomNumber = CommonHelper.GenerateRandomInteger();
 
             //generate captcha control
             var captchaControl = new GRecaptchaControl
             {
                 Theme = captchaSettings.ReCaptchaTheme,
-                Id = "recaptcha",
+                Id = randomNumber,
                 PublicKey = captchaSettings.ReCaptchaPublicKey,
                 Language =  lang
             };

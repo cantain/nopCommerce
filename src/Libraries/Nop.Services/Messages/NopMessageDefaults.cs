@@ -1,5 +1,4 @@
-﻿
-namespace Nop.Services.Messages
+﻿namespace Nop.Services.Messages
 {
     /// <summary>
     /// Represents default values related to messages services
@@ -27,5 +26,10 @@ namespace Nop.Services.Messages
         /// Gets a key pattern to clear cache
         /// </summary>
         public static string MessageTemplatesPatternCacheKey => "Nop.messagetemplate.";
+
+        /// <summary>
+        /// Gets a key for notifications list from TempDataDictionary
+        /// </summary>
+        public static string NotificationListKey => "NotificationList";
     }
 }

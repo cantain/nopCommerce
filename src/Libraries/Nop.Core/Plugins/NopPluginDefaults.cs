@@ -1,4 +1,5 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace Nop.Core.Plugins
 {
     /// <summary>
@@ -15,6 +16,11 @@ namespace Nop.Core.Plugins
         /// Gets the path to file that contains installed plugin system names
         /// </summary>
         public static string InstalledPluginsFilePath => "~/App_Data/installedPlugins.json";
+
+        /// <summary>
+        /// Gets the path to file that contains installed plugin system names
+        /// </summary>
+        public static string PluginsInfoFilePath => "~/App_Data/plugins.json";
 
         /// <summary>
         /// Gets the path to plugins folder
@@ -55,6 +61,11 @@ namespace Nop.Core.Plugins
         /// Gets the name pattern of reserve folder for plugins shadow copies
         /// </summary>
         public static string ReserveShadowCopyPathNamePattern => "reserve_bin_*";
+
+        /// <summary>
+        /// Gets supported extensions of logo file
+        /// </summary>
+        public static List<string> SupportedLogoImageExtensions => new List<string> { "jpg", "png", "gif" };
 
         /// <summary>
         /// Gets the path to temp directory with uploads

@@ -4,6 +4,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
@@ -17,30 +18,33 @@ namespace Nop.Web.Areas.Admin.Controllers
     {
         #region Fields
 
+        private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerAttributeModelFactory _customerAttributeModelFactory;
         private readonly ICustomerAttributeService _customerAttributeService;
-        private readonly ILocalizedEntityService _localizedEntityService;
         private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
-        private readonly ICustomerActivityService _customerActivityService;
 
         #endregion
 
         #region Ctor
 
-        public CustomerAttributeController(ICustomerAttributeModelFactory customerAttributeModelFactory,
+        public CustomerAttributeController(ICustomerActivityService customerActivityService,
+            ICustomerAttributeModelFactory customerAttributeModelFactory,
             ICustomerAttributeService customerAttributeService,
-            ILocalizedEntityService localizedEntityService,
             ILocalizationService localizationService,
-            IPermissionService permissionService,
-            ICustomerActivityService customerActivityService)
+            ILocalizedEntityService localizedEntityService,
+            INotificationService notificationService,
+            IPermissionService permissionService)
         {
+            this._customerActivityService = customerActivityService;
             this._customerAttributeModelFactory = customerAttributeModelFactory;
             this._customerAttributeService = customerAttributeService;
-            this._localizedEntityService = localizedEntityService;
             this._localizationService = localizationService;
+            this._localizedEntityService = localizedEntityService;
+            this._notificationService = notificationService;
             this._permissionService = permissionService;
-            this._customerActivityService = customerActivityService;
         }
 
         #endregion
@@ -132,7 +136,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //locales
                 UpdateAttributeLocales(customerAttribute, model);
 
-                SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Added"));
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Added"));
 
                 if (!continueEditing)
                     return RedirectToAction("List");
@@ -192,7 +196,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             //locales
             UpdateAttributeLocales(customerAttribute, model);
 
-            SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Updated"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Updated"));
 
             if (!continueEditing)
                 return RedirectToAction("List");
@@ -217,7 +221,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 string.Format(_localizationService.GetResource("ActivityLog.DeleteCustomerAttribute"), customerAttribute.Id),
                 customerAttribute);
 
-            SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Deleted"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Customers.CustomerAttributes.Deleted"));
             return RedirectToAction("List");
         }
 

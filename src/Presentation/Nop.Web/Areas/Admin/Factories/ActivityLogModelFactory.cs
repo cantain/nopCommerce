@@ -37,6 +37,23 @@ namespace Nop.Web.Areas.Admin.Factories
         #region Methods
 
         /// <summary>
+        /// Prepare activity log container model
+        /// </summary>
+        /// <param name="activityLogContainerModel">Activity log container model</param>
+        /// <returns>Activity log container model</returns>
+        public virtual ActivityLogContainerModel PrepareActivityLogContainerModel(ActivityLogContainerModel activityLogContainerModel)
+        {
+            if (activityLogContainerModel == null)
+                throw new ArgumentNullException(nameof(activityLogContainerModel));
+
+            //prepare nested models
+            PrepareActivityLogSearchModel(activityLogContainerModel.ListLogs);
+            activityLogContainerModel.ListTypes = PrepareActivityLogTypeModels();
+
+            return activityLogContainerModel;
+        }
+
+        /// <summary>
         /// Prepare activity log type models
         /// </summary>
         /// <returns>List of activity log type models</returns>
@@ -98,6 +115,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 {
                     //fill in model values from the entity
                     var logItemModel = logItem.ToModel<ActivityLogModel>();
+                    logItemModel.ActivityLogTypeName = logItem.ActivityLogType.Name;
+                    logItemModel.CustomerEmail = logItem.Customer.Email;
 
                     //convert dates to the user time
                     logItemModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(logItem.CreatedOnUtc, DateTimeKind.Utc);

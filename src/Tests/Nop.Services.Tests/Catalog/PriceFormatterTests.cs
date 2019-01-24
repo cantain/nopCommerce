@@ -12,9 +12,11 @@ using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
+using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Events;
 using Nop.Services.Localization;
+using Nop.Services.Logging;
 using Nop.Services.Plugins;
 using Nop.Services.Stores;
 using Nop.Tests;
@@ -28,6 +30,7 @@ namespace Nop.Services.Tests.Catalog
         private Mock<IRepository<Currency>> _currencyRepo;
         private Mock<IEventPublisher> _eventPublisher;
         private Mock<IStoreMappingService> _storeMappingService;
+        private Mock<IMeasureService> _measureService;
         private ICurrencyService _currencyService;
         private CurrencySettings _currencySettings;
         private Mock<IWorkContext> _workContext;
@@ -72,14 +75,18 @@ namespace Nop.Services.Tests.Catalog
             _currencyRepo.Setup(x => x.Table).Returns(new List<Currency> { currency1, currency2 }.AsQueryable());
 
             _storeMappingService = new Mock<IStoreMappingService>();
+            _measureService = new Mock<IMeasureService>();
 
             _eventPublisher = new Mock<IEventPublisher>();
             _eventPublisher.Setup(x => x.Publish(It.IsAny<object>()));
 
-            var pluginFinder = new PluginFinder(_eventPublisher.Object);
+            var customerService = new Mock<ICustomerService>();
+            var loger = new Mock<ILogger>();
+            var webHelper = new Mock<IWebHelper>();
 
-            _currencyService = new CurrencyService(cacheManager, _currencyRepo.Object, _storeMappingService.Object,
-                _currencySettings, pluginFinder, null);
+            var pluginService = new PluginService(customerService.Object, loger.Object , CommonHelper.DefaultFileProvider, webHelper.Object);
+
+            _currencyService = new CurrencyService(_currencySettings, null, pluginService, _currencyRepo.Object, cacheManager, _storeMappingService.Object);
 
             _taxSettings = new TaxSettings();
 
@@ -87,8 +94,8 @@ namespace Nop.Services.Tests.Catalog
             _localizationService.Setup(x => x.GetResource("Products.InclTaxSuffix", 1, false, string.Empty, false)).Returns("{0} incl tax");
             _localizationService.Setup(x => x.GetResource("Products.ExclTaxSuffix", 1, false, string.Empty, false)).Returns("{0} excl tax");
             
-            _priceFormatter = new PriceFormatter(_workContext.Object, _currencyService,_localizationService.Object, 
-                _taxSettings, _currencySettings);
+            _priceFormatter = new PriceFormatter(_currencySettings, _currencyService, _localizationService.Object,
+                _measureService.Object, _workContext.Object, _taxSettings);
 
             var nopEngine = new Mock<NopEngine>();
            

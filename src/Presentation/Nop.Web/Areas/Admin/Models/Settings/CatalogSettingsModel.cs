@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using Nop.Web.Areas.Admin.Models.Catalog;
 
 namespace Nop.Web.Areas.Admin.Models.Settings
 {
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         {
             AvailableViewModes = new List<SelectListItem>();
             SortOptionSearchModel = new SortOptionSearchModel();
+            ReviewTypeSearchModel = new ReviewTypeSearchModel();
         }
 
         #endregion
@@ -285,6 +287,10 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         public bool ExportImportRelatedEntitiesByName { get; set; }
         public bool ExportImportRelatedEntitiesByName_OverrideForStore { get; set; }
 
+        [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.ExportImportProductUseLimitedToStores")]
+        public bool ExportImportProductUseLimitedToStores { get; set; }
+        public bool ExportImportProductUseLimitedToStores_OverrideForStore { get; set; }
+
         [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.IgnoreDiscounts")]
         public bool IgnoreDiscounts { get; set; }
 
@@ -305,6 +311,8 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         public bool DisplayDatePreOrderAvailability_OverrideForStore { get; set; }
 
         public SortOptionSearchModel SortOptionSearchModel { get; set; }
+
+        public ReviewTypeSearchModel ReviewTypeSearchModel { get; set; }
 
         #endregion
     }

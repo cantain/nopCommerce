@@ -8,9 +8,6 @@ namespace Nop.Core.Domain.Shipping
     /// </summary>
     public class ShippingSettings : ISettings
     {
-        /// <summary>
-        /// Ctor
-        /// </summary>
         public ShippingSettings()
         {
             ActiveShippingRateComputationMethodSystemNames = new List<string>();
@@ -43,10 +40,15 @@ namespace Nop.Core.Domain.Shipping
         public bool DisplayPickupPointsOnMap { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether ignore additional shipping charge for pick up in store
+        /// </summary>
+        public bool IgnoreAdditionalShippingChargeForPickUpInStore { get; set; }
+
+        /// <summary>
         /// Gets or sets Google map API key
         /// </summary>
         public string GoogleMapsApiKey { get; set; }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether the system should use warehouse location when requesting shipping rates
         /// This is useful when you ship from multiple warehouses

@@ -10,6 +10,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Customers;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
@@ -39,6 +40,7 @@ namespace Nop.Services.Tests.Shipping
         private Mock<IProductService> _productService;
         private Store _store;
         private Mock<IStoreContext> _storeContext;
+        private Mock<IPriceCalculationService> _priceCalcService;
 
         [SetUp]
         public new void SetUp()
@@ -62,32 +64,39 @@ namespace Nop.Services.Tests.Shipping
             _eventPublisher = new Mock<IEventPublisher>();
             _eventPublisher.Setup(x => x.Publish(It.IsAny<object>()));
 
-            var pluginFinder = new PluginFinder(_eventPublisher.Object);
+            var customerService = new Mock<ICustomerService>();
+            var loger = new Mock<ILogger>();
+            var webHelper = new Mock<IWebHelper>();
+
+            var pluginService = new PluginService(customerService.Object, loger.Object , CommonHelper.DefaultFileProvider, webHelper.Object);
 
             _localizationService = new Mock<ILocalizationService>();
             _addressService = new Mock<IAddressService>();
             _genericAttributeService = new Mock<IGenericAttributeService>();
+            _priceCalcService = new Mock<IPriceCalculationService>();
 
             _store = new Store { Id = 1 };
             _storeContext = new Mock<IStoreContext>();
             _storeContext.Setup(x => x.CurrentStore).Returns(_store);
 
             _shoppingCartSettings = new ShoppingCartSettings();
-            _shippingService = new ShippingService(_shippingMethodRepository.Object,
-                _warehouseRepository.Object,
-                _logger,
-                _productService.Object,
-                _productAttributeParser.Object,
+
+            _shippingService = new ShippingService(_addressService.Object,
+                cacheManager,
                 _checkoutAttributeParser.Object,
+                _eventPublisher.Object,
                 _genericAttributeService.Object,
                 _localizationService.Object,
-                _addressService.Object,
-                _shippingSettings, 
-                pluginFinder,
+                _logger,
+                pluginService,
+                _priceCalcService.Object,
+                _productAttributeParser.Object,
+                _productService.Object,
+                _shippingMethodRepository.Object,
+                _warehouseRepository.Object,
                 _storeContext.Object,
-                _eventPublisher.Object,
-                _shoppingCartSettings,
-                cacheManager);
+                _shippingSettings,
+                _shoppingCartSettings);
         }
 
         [Test]

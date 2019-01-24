@@ -11,8 +11,10 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Media;
 using Nop.Core.Infrastructure;
 using Nop.Data;
+using Nop.Services.Catalog;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
+using Nop.Services.Seo;
 
 namespace Nop.Services.Media
 {
@@ -22,80 +24,95 @@ namespace Nop.Services.Media
     public partial class AzurePictureService : PictureService
     {
         #region Fields
-
+        
+        private static bool _azureBlobStorageAppendContainerName;
+        private static bool _isInitialized;
         private static CloudBlobContainer _container;
+        private static string _azureBlobStorageConnectionString;
+        private static string _azureBlobStorageContainerName;
+        private static string _azureBlobStorageEndPoint;
+
         private readonly IStaticCacheManager _cacheManager;
         private readonly MediaSettings _mediaSettings;
-        private readonly NopConfig _config;
+        private readonly object _locker = new object();
 
         #endregion
 
         #region Ctor
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        /// <param name="pictureRepository">Picture repository</param>
-        /// <param name="productPictureRepository">Product picture repository</param>
-        /// <param name="settingService">Setting service</param>
-        /// <param name="webHelper">Web helper</param>
-        /// <param name="dbContext">Database context</param>
-        /// <param name="eventPublisher">Event publisher</param>
-        /// <param name="cacheManager">Cache manager</param>
-        /// <param name="mediaSettings">Media settings</param>
-        /// <param name="config">Config</param>
-        /// <param name="dataProvider">Data provider</param>
-        /// <param name="fileProvider">File provider</param>
-        /// <param name="pictureBinaryRepository">PictureBinary repository</param>
-        public AzurePictureService(IRepository<Picture> pictureRepository,
-            IRepository<ProductPicture> productPictureRepository,
-            ISettingService settingService,
-            IWebHelper webHelper,
+        public AzurePictureService(IDataProvider dataProvider,
             IDbContext dbContext,
             IEventPublisher eventPublisher,
-            IStaticCacheManager cacheManager,
-            MediaSettings mediaSettings,
-            NopConfig config,
-            IDataProvider dataProvider,
             INopFileProvider fileProvider,
-            IRepository<PictureBinary> pictureBinaryRepository)
-            : base(pictureRepository,
-                productPictureRepository,
-                settingService,
-                webHelper,
-                dbContext,
-                eventPublisher,
-                mediaSettings,
-                dataProvider,
-                fileProvider,
-                pictureBinaryRepository)
+            IProductAttributeParser productAttributeParser,
+            IRepository<Picture> pictureRepository,
+            IRepository<PictureBinary> pictureBinaryRepository,
+            IRepository<ProductPicture> productPictureRepository,
+            ISettingService settingService,
+            IStaticCacheManager cacheManager,
+            IUrlRecordService urlRecordService,
+            IWebHelper webHelper,
+            MediaSettings mediaSettings,
+            NopConfig config)
+            : base(dataProvider,
+                  dbContext,
+                  eventPublisher,
+                  fileProvider,
+                  productAttributeParser,
+                  pictureRepository,
+                  pictureBinaryRepository,
+                  productPictureRepository,
+                  settingService,
+                  urlRecordService,
+                  webHelper,
+                  mediaSettings)
         {
             this._cacheManager = cacheManager;
             this._mediaSettings = mediaSettings;
-            this._config = config;
 
-            if (string.IsNullOrEmpty(_config.AzureBlobStorageConnectionString))
-                throw new Exception("Azure connection string for BLOB is not specified");
-
-            if (string.IsNullOrEmpty(_config.AzureBlobStorageContainerName))
-                throw new Exception("Azure container name for BLOB is not specified");
-
-            if (string.IsNullOrEmpty(_config.AzureBlobStorageEndPoint))
-                throw new Exception("Azure end point for BLOB is not specified");
-
-            CreateCloudBlobContainer();
+            OneTimeInit(config);
         }
 
         #endregion
 
         #region Utilities
 
+        protected void OneTimeInit(NopConfig config)
+        {
+            if (_isInitialized) 
+                return;
+
+            if (string.IsNullOrEmpty(config.AzureBlobStorageConnectionString))
+                throw new Exception("Azure connection string for BLOB is not specified");
+
+            if (string.IsNullOrEmpty(config.AzureBlobStorageContainerName))
+                throw new Exception("Azure container name for BLOB is not specified");
+
+            if (string.IsNullOrEmpty(config.AzureBlobStorageEndPoint))
+                throw new Exception("Azure end point for BLOB is not specified");
+
+            lock (_locker)
+            {
+                if (_isInitialized) 
+                    return;
+
+                _azureBlobStorageAppendContainerName = config.AzureBlobStorageAppendContainerName;
+                _azureBlobStorageConnectionString = config.AzureBlobStorageConnectionString;
+                _azureBlobStorageContainerName = config.AzureBlobStorageContainerName.Trim().ToLower();
+                _azureBlobStorageEndPoint = config.AzureBlobStorageEndPoint.Trim().ToLower().TrimEnd('/');
+                
+                CreateCloudBlobContainer();
+
+                _isInitialized = true;
+            }
+        }
+
         /// <summary>
         /// Create cloud blob container
         /// </summary>
         protected virtual async void CreateCloudBlobContainer()
         {
-            var storageAccount = CloudStorageAccount.Parse(_config.AzureBlobStorageConnectionString);
+            var storageAccount = CloudStorageAccount.Parse(_azureBlobStorageConnectionString);
             if (storageAccount == null)
                 throw new Exception("Azure connection string for BLOB is not working");
 
@@ -103,7 +120,7 @@ namespace Nop.Services.Media
             var blobClient = storageAccount.CreateCloudBlobClient();
 
             //GetContainerReference doesn't need to be async since it doesn't contact the server yet
-            _container = blobClient.GetContainerReference(_config.AzureBlobStorageContainerName);
+            _container = blobClient.GetContainerReference(_azureBlobStorageContainerName);
 
             await _container.CreateIfNotExistsAsync();
             await _container.SetPermissionsAsync(new BlobContainerPermissions
@@ -128,7 +145,9 @@ namespace Nop.Services.Media
         /// <returns>Local picture thumb path</returns>
         protected override string GetThumbLocalPath(string thumbFileName)
         {
-            return $"{_config.AzureBlobStorageEndPoint}{_config.AzureBlobStorageContainerName}/{thumbFileName}";
+            var path = _azureBlobStorageAppendContainerName ? _azureBlobStorageContainerName + "/" : string.Empty;
+
+            return $"{_azureBlobStorageEndPoint}/{path}{thumbFileName}";
         }
 
         /// <summary>
@@ -139,7 +158,7 @@ namespace Nop.Services.Media
         /// <returns>Local picture thumb path</returns>
         protected override string GetThumbUrl(string thumbFileName, string storeLocation = null)
         {
-            return $"{_config.AzureBlobStorageEndPoint}{_config.AzureBlobStorageContainerName}/{thumbFileName}";
+            return GetThumbLocalPath(thumbFileName);
         }
 
         /// <summary>
@@ -203,7 +222,7 @@ namespace Nop.Services.Media
             try
             {
                 var key = string.Format(NopMediaDefaults.ThumbExistsCacheKey, thumbFileName);
-                return await _cacheManager.Get(key, async () =>
+                return await _cacheManager.GetAsync(key, async () =>
                 {
                     //GetBlockBlobReference doesn't need to be async since it doesn't contact the server yet
                     var blockBlob = _container.GetBlockBlobReference(thumbFileName);
@@ -211,7 +230,10 @@ namespace Nop.Services.Media
                     return await blockBlob.ExistsAsync();
                 });
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>

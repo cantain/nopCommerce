@@ -23,21 +23,16 @@ namespace Nop.Core
     {
         #region Fields 
 
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HostingConfig _hostingConfig;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly INopFileProvider _fileProvider;
 
         #endregion
 
         #region Ctor
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        /// <param name="hostingConfig">Hosting config</param>
-        /// <param name="httpContextAccessor">HTTP context accessor</param>
-        /// <param name="fileProvider">File provider</param>
-        public WebHelper(HostingConfig hostingConfig, IHttpContextAccessor httpContextAccessor,
+        public WebHelper(HostingConfig hostingConfig,
+            IHttpContextAccessor httpContextAccessor,
             INopFileProvider fileProvider)
         {
             this._hostingConfig = hostingConfig;
@@ -312,9 +307,15 @@ namespace Nop.Core
             var queryParameters = QueryHelpers.ParseQuery(uri.Query);
 
             //and add passed one
-            queryParameters[key] = new StringValues(values);
+            queryParameters[key] = string.Join(",", values);
+            
+            //add only first value
+            //two the same query parameters? theoretically it's not possible.
+            //but MVC has some ugly implementation for checkboxes and we can have two values
+            //find more info here: http://www.mindstorminteractive.com/topics/jquery-fix-asp-net-mvc-checkbox-truefalse-value/
+            //we do this validation just to ensure that the first one is not overridden
             var queryBuilder = new QueryBuilder(queryParameters
-                .ToDictionary(parameter => parameter.Key, parameter => parameter.Value.ToString()));
+                .ToDictionary(parameter => parameter.Key, parameter => parameter.Value.FirstOrDefault()?.ToString() ?? string.Empty));
 
             //create new URL with passed query parameters
             url = $"{uri.GetLeftPart(UriPartial.Path)}{queryBuilder.ToQueryString()}{uri.Fragment}";

@@ -8,9 +8,6 @@ namespace Nop.Core.Domain.Catalog
     /// </summary>
     public class CatalogSettings : ISettings
     {
-        /// <summary>
-        /// Ctor
-        /// </summary>
         public CatalogSettings()
         {
             ProductSortingEnumDisabled = new List<int>();
@@ -402,6 +399,11 @@ namespace Nop.Core.Domain.Catalog
         /// Gets or sets a value indicating whether the products need to be exported/imported with their attributes
         /// </summary>
         public bool ExportImportProductAttributes { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether need to use "limited to stores" property for exported/imported products
+        /// </summary>
+        public bool ExportImportProductUseLimitedToStores { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the products need to be exported/imported with their specification attributes

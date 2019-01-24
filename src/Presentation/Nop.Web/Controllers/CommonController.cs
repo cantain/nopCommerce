@@ -16,7 +16,6 @@ using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Vendors;
 using Nop.Web.Factories;
-using Nop.Web.Framework.Localization;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
 using Nop.Web.Framework.Security.Captcha;
@@ -29,63 +28,62 @@ namespace Nop.Web.Controllers
     {
         #region Fields
 
+        private readonly CaptchaSettings _captchaSettings;
+        private readonly CommonSettings _commonSettings;
         private readonly ICommonModelFactory _commonModelFactory;
-        private readonly ILanguageService _languageService;
         private readonly ICurrencyService _currencyService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILanguageService _languageService;
         private readonly ILocalizationService _localizationService;
-        private readonly IWorkContext _workContext;
+        private readonly ILogger _logger;
         private readonly IStoreContext _storeContext;
         private readonly IThemeContext _themeContext;
-        private readonly IGenericAttributeService _genericAttributeService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly IVendorService _vendorService;
+        private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
-        private readonly ILogger _logger;
-        
-        private readonly StoreInformationSettings _storeInformationSettings;
-        private readonly CommonSettings _commonSettings;
         private readonly LocalizationSettings _localizationSettings;
-        private readonly CaptchaSettings _captchaSettings;
+        private readonly StoreInformationSettings _storeInformationSettings;
         private readonly VendorSettings _vendorSettings;
         
         #endregion
         
         #region Ctor
 
-        public CommonController(ICommonModelFactory commonModelFactory,
-            ILanguageService languageService,
+        public CommonController(CaptchaSettings captchaSettings,
+            CommonSettings commonSettings,
+            ICommonModelFactory commonModelFactory,
             ICurrencyService currencyService,
+            ICustomerActivityService customerActivityService,
+            IGenericAttributeService genericAttributeService,
+            ILanguageService languageService,
             ILocalizationService localizationService,
-            IWorkContext workContext,
+            ILogger logger,
             IStoreContext storeContext,
             IThemeContext themeContext,
-            IGenericAttributeService genericAttributeService,
-            ICustomerActivityService customerActivityService,
             IVendorService vendorService,
+            IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
-            ILogger logger,
-            StoreInformationSettings storeInformationSettings,
-            CommonSettings commonSettings,
             LocalizationSettings localizationSettings,
-            CaptchaSettings captchaSettings,
+            StoreInformationSettings storeInformationSettings,
             VendorSettings vendorSettings)
         {
+            this._captchaSettings = captchaSettings;
+            this._commonSettings = commonSettings;
             this._commonModelFactory = commonModelFactory;
-            this._languageService = languageService;
             this._currencyService = currencyService;
+            this._customerActivityService = customerActivityService;
+            this._genericAttributeService = genericAttributeService;
+            this._languageService = languageService;
             this._localizationService = localizationService;
-            this._workContext = workContext;
+            this._logger = logger;
             this._storeContext = storeContext;
             this._themeContext = themeContext;
-            this._genericAttributeService = genericAttributeService;
-            this._customerActivityService = customerActivityService;
             this._vendorService = vendorService;
+            this._workContext = workContext;
             this._workflowMessageService = workflowMessageService;
-            this._logger = logger;
-            this._storeInformationSettings = storeInformationSettings;
-            this._commonSettings = commonSettings;
             this._localizationSettings = localizationSettings;
-            this._captchaSettings = captchaSettings;
+            this._storeInformationSettings = storeInformationSettings;
             this._vendorSettings = vendorSettings;
         }
 

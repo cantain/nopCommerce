@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nop.Core;
-using Nop.Core.Domain.Payments;
-using Nop.Core.Plugins;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Payments;
+using Nop.Services.Plugins;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Areas.Admin.Models.Payments;
@@ -24,9 +22,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ICountryService _countryService;
         private readonly ILocalizationService _localizationService;
         private readonly IPaymentService _paymentService;
-        private readonly IWebHelper _webHelper;
-        private readonly IWorkContext _workContext;
-        private readonly PaymentSettings _paymentSettings;
+        private readonly IPluginService _pluginService;
 
         #endregion
 
@@ -35,16 +31,12 @@ namespace Nop.Web.Areas.Admin.Factories
         public PaymentModelFactory(ICountryService countryService,
             ILocalizationService localizationService,
             IPaymentService paymentService,
-            IWebHelper webHelper,
-            IWorkContext workContext,
-            PaymentSettings paymentSettings)
+            IPluginService pluginService)
         {
             this._countryService = countryService;
             this._localizationService = localizationService;
             this._paymentService = paymentService;
-            this._webHelper = webHelper;
-            this._workContext = workContext;
-            this._paymentSettings = paymentSettings;
+            this._pluginService = pluginService;
         }
 
         #endregion
@@ -106,10 +98,10 @@ namespace Nop.Web.Areas.Admin.Factories
                     var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
 
                     //fill in additional values (not existing in the entity)
-                    paymentMethodModel.IsActive = method.IsPaymentMethodActive(_paymentSettings);
+                    paymentMethodModel.IsActive = _paymentService.IsPaymentMethodActive(method);
                     paymentMethodModel.ConfigurationUrl = method.GetConfigurationPageUrl();
-                    paymentMethodModel.LogoUrl = method.PluginDescriptor.GetLogoUrl(_webHelper);
-                    paymentMethodModel.RecurringPaymentType = method.RecurringPaymentType.GetLocalizedEnum(_localizationService, _workContext);
+                    paymentMethodModel.LogoUrl = _pluginService.GetPluginLogoUrl(method.PluginDescriptor);
+                    paymentMethodModel.RecurringPaymentType = _localizationService.GetLocalizedEnum(method.RecurringPaymentType);
 
                     return paymentMethodModel;
                 }),
@@ -130,11 +122,20 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(model));
 
             var countries = _countryService.GetAllCountries(showHidden: true);
-            model.AvailableCountries = countries.Select(country => country.ToModel<CountryModel>()).ToList();
+            model.AvailableCountries = countries.Select(country =>
+            {
+                var countryModel = country.ToModel<CountryModel>();
+                countryModel.NumberOfStates = country.StateProvinces?.Count ?? 0;
+
+                return countryModel;
+            }).ToList();
 
             foreach (var method in _paymentService.LoadAllPaymentMethods())
             {
-                model.AvailablePaymentMethods.Add(method.ToPluginModel<PaymentMethodModel>());
+                var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
+                paymentMethodModel.RecurringPaymentType = _localizationService.GetLocalizedEnum(method.RecurringPaymentType);
+
+                model.AvailablePaymentMethods.Add(paymentMethodModel);
 
                 var restrictedCountries = _paymentService.GetRestictedCountryIds(method);
                 foreach (var country in countries)
